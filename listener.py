@@ -194,10 +194,10 @@ def window_text(minutes, used, reset, now):
         local_reset = dt.datetime.fromtimestamp(reset, TIMEZONE)
         local_now = dt.datetime.fromtimestamp(now, TIMEZONE)
         day_delta = (local_reset.date() - local_now.date()).days
-        day = {0: 'today', 1: 'tomorrow'}.get(day_delta) if label == '5h' else None
-        day = day or local_reset.strftime('%d.%m')
-        weekday = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')[local_reset.weekday()]
-        day = weekday + ' ' + day
+        day = {0: 'today', 1: 'tomorrow'}.get(day_delta)
+        if not day:
+            weekday = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')[local_reset.weekday()]
+            day = weekday + ' ' + local_reset.strftime('%d.%m')
         clock = str(local_reset.hour % 12 or 12)
         if local_reset.minute:
             clock += local_reset.strftime(':%M')
@@ -282,7 +282,7 @@ def listen(binary):
                                              'allowed_updates': '["message"]'})
             offset = backlog[-1]['update_id'] + 1 if backlog else 0
             save_json(cursor, offset)
-        cached = {}; cached_at = {}; last_reply = 0
+        cached = {}; cached_at = {}; last_reply = {}
         print('Iskra listener ready', flush=True)
         while True:
             try:
@@ -297,9 +297,9 @@ def listen(binary):
                     save_json(cursor, offset)
                     now = time.time()
                     mode = authorized_status(update, owner, me['username'], now)
-                    if not mode or now - last_reply < 10:
+                    if not mode or now - last_reply.get(mode, 0) < 10:
                         continue
-                    last_reply = now
+                    last_reply[mode] = now
                     if now - cached_at.get(mode, 0) >= 60:
                         cached[mode] = status_text(binary, short=mode == 'short')
                         cached_at[mode] = time.time()

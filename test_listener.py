@@ -104,9 +104,11 @@ class ListenerTests(unittest.TestCase):
     def test_compact_dates_width_and_midnight(self):
         now = dt.datetime(2026, 11, 8, 23, 0, tzinfo=listener.TIMEZONE).timestamp()
         reset = dt.datetime(2026, 11, 9, 8, 0, tzinfo=listener.TIMEZONE).timestamp()
-        self.assertIn('Mon tomorrow 8AM', listener.window_text(300, 87, reset, now))
-        self.assertIn('Mon 09.11 8AM', listener.window_text(10080, 60, reset, now))
-        self.assertIn('Sun today 11PM', listener.window_text(300, 87, now, now - 60))
+        self.assertTrue(listener.window_text(300, 87, reset, now).endswith('\n   tomorrow 8AM'))
+        self.assertTrue(listener.window_text(10080, 60, reset, now).endswith('\n   tomorrow 8AM'))
+        self.assertTrue(listener.window_text(300, 87, now, now - 60).endswith('\n   today 11PM'))
+        later = dt.datetime(2026, 11, 12, 14, 0, tzinfo=listener.TIMEZONE).timestamp()
+        self.assertTrue(listener.window_text(10080, 60, later, now).endswith('\n   Thu 12.11 2PM'))
         for used in (0, 13, 40, 99, 100):
             for window in (300, 10080):
                 lines = listener.window_text(window, used, reset, now).splitlines()
@@ -125,6 +127,9 @@ class ListenerTests(unittest.TestCase):
             stranger = copy.deepcopy(self.update)
             stranger['update_id'] = 11
             stranger['message']['from']['id'] = 999
+            short, short_again = copy.deepcopy(self.update), copy.deepcopy(self.update)
+            short['update_id'], short_again['update_id'] = 12, 13
+            short['message']['text'] = short_again['message']['text'] = '/status short'
             calls = []
 
             def telegram(method, fields=None):
@@ -136,7 +141,7 @@ class ListenerTests(unittest.TestCase):
                 if method == 'getUpdates':
                     polls = sum(item[0] == 'getUpdates' for item in calls)
                     if polls == 1:
-                        return [self.update, self.update, stranger]
+                        return [self.update, self.update, stranger, short, short_again]
                     raise KeyboardInterrupt
                 return {}
 
@@ -145,9 +150,9 @@ class ListenerTests(unittest.TestCase):
                  patch('listener.time.time', return_value=1000), patch('sys.stdout', io.StringIO()):
                 with self.assertRaises(KeyboardInterrupt):
                     listener.listen('/fake/codex')
-                status.assert_called_once()
-            self.assertEqual(sum(method == 'sendMessage' for method, _ in calls), 1)
-            self.assertEqual(json.loads((config / 'offset.json').read_text()), 12)
+                self.assertEqual(status.call_count, 2)
+            self.assertEqual(sum(method == 'sendMessage' for method, _ in calls), 2)
+            self.assertEqual(json.loads((config / 'offset.json').read_text()), 14)
 
 
 if __name__ == '__main__':

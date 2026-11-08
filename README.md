@@ -27,10 +27,10 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 
 ## Everyday use
 
-- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left, with the time until the reset. Resets show a short weekday and the date without the year, or `today` / `tomorrow`. The `Updated` footer is when the data was read. Times use your Mac's time zone.
+- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left, with the time until the reset. Resets show `today` or `tomorrow` with the time, otherwise a short weekday and the date without the year. The `Updated` footer is when the data was read. Times use your Mac's time zone.
 - Send `/status short` for one line per tool with the limit left, e.g. `Claude 5h 88% · 7d 54%`.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
-- The service starts at login. Data is cached for 60 s, and replies are at least 10 s apart.
+- The service starts at login. Data is cached for 60 s.
 
 Copy **[AGENTS-SAMPLE.md](AGENTS-SAMPLE.md)** to `AGENTS.md` and adjust it to your rules. `AGENTS.md` stays local and is ignored by Git. Your coordinator should read the current file before notifying – add a reference with its full path to the coordinator's startup instructions. Writing the rules does not start any agents.
 
@@ -65,6 +65,7 @@ Run the local tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_
 - Claude limits come from an undocumented endpoint used by Claude Code. An update may break it.
 - Tested on one Mac so far.
 - The Mac must be awake, online and signed in.
+- Each command replies at most once per 10 s. Extra requests are ignored without a reply.
 
 ## Contributing
 

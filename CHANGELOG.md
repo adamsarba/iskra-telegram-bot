@@ -9,6 +9,8 @@
 ### Changed
 
 - `/status` shows the time until each reset (`Reset in …`) instead of the percentage used.
+- Resets due today or tomorrow show only `today` / `tomorrow` and the time.
+- The 10 s reply limit applies to each command separately.
 
 ## 1.0.0-alpha.1 – 2026-11-08
 
