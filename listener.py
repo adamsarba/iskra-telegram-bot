@@ -231,13 +231,13 @@ def status_text(binary, short=False):
             try:
                 windows = job.result()
                 if short:
-                    sections.append(name + ' ' + (' · '.join(window_short(*w) for w in windows) or 'n/a'))
+                    sections.append(name + ': ' + (' · '.join(window_short(*w) for w in windows) or 'n/a'))
                     continue
                 lines = [window_text(*window, time.time()) for window in windows]
                 sections.append(name + '\n' + ('\n'.join(lines) or 'Data unavailable'))
             except Exception as error:
                 if short:
-                    sections.append(name + ' n/a')
+                    sections.append(name + ': n/a')
                     continue
                 detail = str(error) if isinstance(error, Unavailable) else 'read failed'
                 sections.append(name + '\nData unavailable\n' + textwrap.fill(detail, width=26))

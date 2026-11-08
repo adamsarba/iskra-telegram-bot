@@ -87,7 +87,7 @@ class ListenerTests(unittest.TestCase):
              patch('listener.claude_limits', return_value=[(300, 12, 4600), (10080, 46.4, 9000)]), \
              patch('listener.codex_limits', side_effect=listener.Unavailable('HTTP 401')):
             text = listener.status_text('/fake/codex', short=True)
-        self.assertEqual(text, 'Claude 5h 88% · 7d 54%\nCodex n/a')
+        self.assertEqual(text, 'Claude: 5h 88% · 7d 54%\nCodex: n/a')
 
     def test_single_provider(self):
         with patch('listener.claude_configured', return_value=False), \

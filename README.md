@@ -28,7 +28,7 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 ## Everyday use
 
 - In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left, with the time until the reset. Resets show `today` or `tomorrow` with the time, otherwise a short weekday and the date without the year. The `Updated` footer is when the data was read. Times use your Mac's time zone.
-- Send `/status short` for one line per tool with the limit left, e.g. `Claude 5h 88% · 7d 54%`.
+- Send `/status short` for one line per tool with the limit left, e.g. `Claude: 5h 88% · 7d 54%`.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
 - The service starts at login. Data is cached for 60 s.
 
