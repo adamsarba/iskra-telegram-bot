@@ -208,12 +208,12 @@ def status_text(binary):
     sections = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         jobs = []
-        if binary:
-            jobs.append(('Codex', pool.submit(codex_limits, binary)))
         if claude_configured():
             jobs.append(('Claude', pool.submit(claude_limits)))
+        if binary:
+            jobs.append(('Codex', pool.submit(codex_limits, binary)))
         if not jobs:
-            sections.append('No Codex or Claude Code sign-in found')
+            sections.append('No Claude Code or Codex sign-in found')
         for name, job in jobs:
             try:
                 windows = job.result()
@@ -313,7 +313,7 @@ def main():
     if args.codex and not Path(args.codex).is_file():
         parser.error('Codex executable not found at ' + args.codex)
     if not args.codex and not claude_configured():
-        parser.error('Neither Codex nor a Claude Code sign-in found; pass --codex /absolute/path')
+        parser.error('Neither a Claude Code sign-in nor Codex found; pass --codex /absolute/path')
     os.umask(0o077)
     if args.command == 'status':
         print(status_text(args.codex))
