@@ -105,7 +105,7 @@ def codex_limits(binary):
 
     try:
         send({'id': 1, 'method': 'initialize', 'params': {
-            'clientInfo': {'name': 'iskra', 'version': '1.0.0-alpha.1'}}})
+            'clientInfo': {'name': 'iskra', 'version': '1.0.0-beta.1'}}})
         deadline = time.monotonic() + 15
         while time.monotonic() < deadline:
             if not selector.select(0.5):
@@ -161,23 +161,36 @@ def claude_limits():
     return windows
 
 
-def window_text(minutes, used, reset, now):
-    label = {300: '5h', 10080: '7d'}.get(minutes, str(minutes) + 'm')
+def window_label(minutes):
+    return {300: '5h', 10080: '7d'}.get(minutes, str(minutes) + 'm')
+
+
+def remaining_percent(used):
     if not isinstance(used, (int, float)) or not math.isfinite(used):
+        return None
+    return 100 - round(min(100, max(0, used)))
+
+
+def window_short(minutes, used, reset=None):
+    remaining = remaining_percent(used)
+    return window_label(minutes) + (' n/a' if remaining is None else f' {remaining}%')
+
+
+def window_text(minutes, used, reset, now):
+    label = window_label(minutes)
+    remaining = remaining_percent(used)
+    if remaining is None:
         return label + ' · data unavailable'
-    used = round(min(100, max(0, used)))
-    remaining = 100 - used
     filled = round(remaining / 10)
     bar = '█' * filled + '░' * (10 - filled)
     line = f'{label} [{bar}] {remaining}% left'
-    detail = f'   {used}% used'
     if reset is not None:
         seconds = max(0, reset - now)
         total_minutes = math.ceil(seconds / 60)
         days, remainder = divmod(total_minutes, 1440)
         hours, minutes = divmod(remainder, 60)
         duration = f'{days}d {hours}h' if days else (f'{hours}h {minutes}m' if hours else f'{minutes}m')
-        detail += ' · in ' + duration if seconds else ' · reset pending'
+        detail = '   Reset in ' + duration if seconds else '   Reset pending'
         local_reset = dt.datetime.fromtimestamp(reset, TIMEZONE)
         local_now = dt.datetime.fromtimestamp(now, TIMEZONE)
         day_delta = (local_reset.date() - local_now.date()).days
@@ -190,7 +203,7 @@ def window_text(minutes, used, reset, now):
             clock += local_reset.strftime(':%M')
         clock += 'AM' if local_reset.hour < 12 else 'PM'
         return line + '\n' + detail + '\n   ' + day + ' ' + clock
-    return line + '\n' + detail
+    return line
 
 
 def status_fields(owner, text):
@@ -204,7 +217,7 @@ def claude_configured():
     return result.returncode == 0
 
 
-def status_text(binary):
+def status_text(binary, short=False):
     sections = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
         jobs = []
@@ -217,24 +230,36 @@ def status_text(binary):
         for name, job in jobs:
             try:
                 windows = job.result()
+                if short:
+                    sections.append(name + ' ' + (' · '.join(window_short(*w) for w in windows) or 'n/a'))
+                    continue
                 lines = [window_text(*window, time.time()) for window in windows]
                 sections.append(name + '\n' + ('\n'.join(lines) or 'Data unavailable'))
             except Exception as error:
+                if short:
+                    sections.append(name + ' n/a')
+                    continue
                 detail = str(error) if isinstance(error, Unavailable) else 'read failed'
                 sections.append(name + '\nData unavailable\n' + textwrap.fill(detail, width=26))
+    if short:
+        return '\n'.join(sections)
     return '\n\n'.join(sections) + '\n\n' + dt.datetime.now(TIMEZONE).strftime('Updated %H:%M') + ' · ' + TIMEZONE_LABEL
 
 
 def authorized_status(update, owner, username, now):
+    # Returns 'full', 'short' or None. Only these exact commands are accepted.
     message = update.get('message') or {}
     chat = message.get('chat') or {}
     sender = message.get('from') or {}
     age = now - message.get('date', 0)
-    return (chat.get('type') == 'private' and chat.get('id') == owner
-            and sender.get('id') == owner and sender.get('is_bot') is False
-            and not message.get('forward_origin') and not message.get('forward_date')
-            and not message.get('via_bot') and -5 <= age <= 120
-            and message.get('text', '').strip() in ('/status', '/status@' + username))
+    allowed = (chat.get('type') == 'private' and chat.get('id') == owner
+               and sender.get('id') == owner and sender.get('is_bot') is False
+               and not message.get('forward_origin') and not message.get('forward_date')
+               and not message.get('via_bot') and -5 <= age <= 120)
+    command = ' '.join(message.get('text', '').split())
+    commands = {'/status': 'full', '/status@' + username: 'full',
+                '/status short': 'short', '/status@' + username + ' short': 'short'}
+    return commands.get(command) if allowed else None
 
 
 def listen(binary):
@@ -257,7 +282,7 @@ def listen(binary):
                                              'allowed_updates': '["message"]'})
             offset = backlog[-1]['update_id'] + 1 if backlog else 0
             save_json(cursor, offset)
-        cached = ''; cached_at = 0; last_reply = 0
+        cached = {}; cached_at = {}; last_reply = 0
         print('Iskra listener ready', flush=True)
         while True:
             try:
@@ -271,13 +296,14 @@ def listen(binary):
                     offset = update['update_id'] + 1
                     save_json(cursor, offset)
                     now = time.time()
-                    if not authorized_status(update, owner, me['username'], now) or now - last_reply < 10:
+                    mode = authorized_status(update, owner, me['username'], now)
+                    if not mode or now - last_reply < 10:
                         continue
                     last_reply = now
-                    if now - cached_at >= 60:
-                        cached = status_text(binary)
-                        cached_at = time.time()
-                    telegram('sendMessage', status_fields(owner, cached))
+                    if now - cached_at.get(mode, 0) >= 60:
+                        cached[mode] = status_text(binary, short=mode == 'short')
+                        cached_at[mode] = time.time()
+                    telegram('sendMessage', status_fields(owner, cached[mode]))
             except Exception as error:
                 detail = str(error) if isinstance(error, Unavailable) else type(error).__name__
                 print('Iskra retry · ' + detail, flush=True)

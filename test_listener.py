@@ -22,9 +22,10 @@ class ListenerTests(unittest.TestCase):
         return listener.authorized_status(update, 123, 'example_iskra_bot', 1000)
 
     def test_owner_and_addressed_command(self):
-        self.assertTrue(self.accepts(self.update))
-        self.update['message']['text'] = '/status@example_iskra_bot'
-        self.assertTrue(self.accepts(self.update))
+        for text, mode in [('/status', 'full'), ('/status@example_iskra_bot', 'full'),
+                           ('/status short', 'short'), ('/status@example_iskra_bot short', 'short')]:
+            self.update['message']['text'] = text
+            self.assertEqual(self.accepts(self.update), mode)
 
     def test_rejects_other_senders_groups_and_bots(self):
         for field, key, value in [('from', 'id', 999), ('chat', 'id', 999),
@@ -35,7 +36,7 @@ class ListenerTests(unittest.TestCase):
 
     def test_rejects_forwarded_stale_and_arbitrary_commands(self):
         for key, value in [('forward_origin', {'type': 'user'}), ('via_bot', {'id': 456}),
-                           ('date', 800), ('date', 1010), ('text', '/status extra'),
+                           ('date', 800), ('date', 1010), ('text', '/status extra'), ('text', '/status short extra'),
                            ('text', '/status@other_bot'), ('text', '$(touch /tmp/injected)')]:
             update = copy.deepcopy(self.update)
             update['message'][key] = value
@@ -70,7 +71,8 @@ class ListenerTests(unittest.TestCase):
 
     def test_format_and_partial_provider_failure(self):
         self.assertIn('65% left', listener.window_text(300, 35, 4600, 1000))
-        self.assertIn('in 1h 0m', listener.window_text(300, 35, 4600, 1000))
+        self.assertIn('\n   Reset in 1h 0m\n', listener.window_text(300, 35, 4600, 1000))
+        self.assertNotIn('used', listener.window_text(300, 35, 4600, 1000))
         with patch('listener.claude_configured', return_value=True), \
              patch('listener.codex_limits', return_value=[(300, 35, None)]), \
              patch('listener.claude_limits', side_effect=listener.Unavailable('HTTP 401')):
@@ -79,6 +81,13 @@ class ListenerTests(unittest.TestCase):
             self.assertIn('Claude\nData unavailable\nHTTP 401', text)
             self.assertIn('Updated ', text)
             self.assertIn(' · ' + listener.TIMEZONE_LABEL, text)
+
+    def test_short_status_one_line_per_provider(self):
+        with patch('listener.claude_configured', return_value=True), \
+             patch('listener.claude_limits', return_value=[(300, 12, 4600), (10080, 46.4, 9000)]), \
+             patch('listener.codex_limits', side_effect=listener.Unavailable('HTTP 401')):
+            text = listener.status_text('/fake/codex', short=True)
+        self.assertEqual(text, 'Claude 5h 88% · 7d 54%\nCodex n/a')
 
     def test_single_provider(self):
         with patch('listener.claude_configured', return_value=False), \

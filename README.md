@@ -1,6 +1,6 @@
 # Iskra – Private Telegram Bot
 
-[![Version: 1.0.0-alpha.1](https://img.shields.io/badge/version-1.0.0--alpha.1-orange)](CHANGELOG.md) [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![Version: 1.0.0-beta.1](https://img.shields.io/badge/version-1.0.0--beta.1-orange)](CHANGELOG.md) [![Status: in testing](https://img.shields.io/badge/status-in_testing-yellow)](#known-limitations) [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 Iskra sends short notifications from agents. The `/status` command shows Claude Code and/or Codex usage limits, the percentage left and reset times. It runs locally on a Mac and calls no models when answering this command.
 
@@ -27,7 +27,8 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 
 ## Everyday use
 
-- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left. Resets show a short weekday and the date without the year, or `today` / `tomorrow`. The `Updated` footer is when the data was read. Times use your Mac's time zone.
+- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left, with the time until the reset. Resets show a short weekday and the date without the year, or `today` / `tomorrow`. The `Updated` footer is when the data was read. Times use your Mac's time zone.
+- Send `/status short` for one line per tool with the limit left, e.g. `Claude 5h 88% · 7d 54%`.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
 - The service starts at login. Data is cached for 60 s, and replies are at least 10 s apart.
 
