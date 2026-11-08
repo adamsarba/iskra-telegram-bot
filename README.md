@@ -2,8 +2,6 @@
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
-**English** · [Polski](README.pl.md)
-
 Iskra sends short notifications from agents. The `/status` command shows Claude Code and/or Codex usage limits, the percentage left and reset times. It runs locally on a Mac and calls no models when answering this command.
 
 Status: alpha (`1.0.0-alpha.1`) – see the [changelog](CHANGELOG.md).
