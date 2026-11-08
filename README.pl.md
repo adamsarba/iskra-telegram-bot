@@ -4,11 +4,11 @@
 
 [English](README.md) · **Polski**
 
-Iskra wysyła krótkie powiadomienia od agentów. Komenda `/status` pokazuje limity Codexa i Claude’a, pozostałe procenty oraz terminy resetu. Działa lokalnie na Macu, bez wywoływania modeli przy obsłudze tej komendy.
+Iskra wysyła krótkie powiadomienia od agentów. Komenda `/status` pokazuje limity Codexa i/lub Claude’a, pozostałe procenty oraz terminy resetu. Działa lokalnie na Macu, bez wywoływania modeli przy obsłudze tej komendy.
 
 ## Uruchomienie na swoim Macu
 
-Potrzebujesz Telegrama, Pęku kluczy, curl, Pythona 3.9+ oraz zainstalowanych i zalogowanych CLI Codexa i Claude Code. Sprawdź `python3 --version`, `codex --version` i `claude auth status`. Instalatory są na stronach [Python](https://www.python.org/downloads/macos/), [Codex](https://learn.chatgpt.com/docs/cli) i [Claude Code](https://code.claude.com/docs/en/quickstart). Limity wymagają logowania do kont z subskrypcją.
+Potrzebujesz Telegrama, Pęku kluczy, curl, Pythona 3.9+ oraz zainstalowanego i zalogowanego CLI Codexa i/lub Claude Code. `/status` pokazuje tylko te, których używasz. Sprawdź `python3 --version` oraz `codex --version` i/lub `claude auth status`. Instalatory są na stronach [Python](https://www.python.org/downloads/macos/), [Codex](https://learn.chatgpt.com/docs/cli) i [Claude Code](https://code.claude.com/docs/en/quickstart). Limity wymagają logowania do kont z subskrypcją.
 
 1. Umieść ten katalog w stałym miejscu. Otwórz Terminal w tym katalogu.
 2. W Telegramie otwórz oficjalnego `@BotFather`, wyślij `/newbot` i utwórz własnego bota. Zachowaj otrzymany token dla siebie.

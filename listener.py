@@ -197,11 +197,23 @@ def status_fields(owner, text):
     return {'chat_id': owner, 'text': '<pre>' + html.escape(text) + '</pre>', 'parse_mode': 'HTML'}
 
 
+def claude_configured():
+    # Checks that Claude Code has stored a sign-in, without reading the secret.
+    result = subprocess.run(['/usr/bin/security', 'find-generic-password', '-s', 'Claude Code-credentials'],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+    return result.returncode == 0
+
+
 def status_text(binary):
     sections = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
-        jobs = [('Codex', pool.submit(codex_limits, binary)),
-                ('Claude', pool.submit(claude_limits))]
+        jobs = []
+        if binary:
+            jobs.append(('Codex', pool.submit(codex_limits, binary)))
+        if claude_configured():
+            jobs.append(('Claude', pool.submit(claude_limits)))
+        if not jobs:
+            sections.append('No Codex or Claude Code sign-in found')
         for name, job in jobs:
             try:
                 windows = job.result()
@@ -277,8 +289,9 @@ def install(binary):
     os.chmod(CONFIG, 0o700)
     agent = Path.home() / 'Library/LaunchAgents' / (LABEL + '.plist')
     agent.parent.mkdir(parents=True, exist_ok=True)
-    data = {'Label': LABEL, 'ProgramArguments': [sys.executable, str(Path(__file__).resolve()),
-            '--codex', binary, 'listen'], 'RunAtLoad': True, 'KeepAlive': True,
+    codex = ['--codex', binary] if binary else []
+    data = {'Label': LABEL, 'ProgramArguments': [sys.executable, str(Path(__file__).resolve())]
+            + codex + ['listen'], 'RunAtLoad': True, 'KeepAlive': True,
             'ThrottleInterval': 15, 'Umask': 0o077,
             'WorkingDirectory': str(Path(__file__).resolve().parent),
             'StandardOutPath': str(CONFIG / 'listener.log'),
@@ -297,8 +310,10 @@ def main():
     parser.add_argument('--codex', default=shutil.which('codex'))
     parser.add_argument('command', choices=('status', 'listen', 'install'))
     args = parser.parse_args()
-    if not args.codex or not Path(args.codex).is_file():
-        parser.error('Codex executable missing; pass --codex /absolute/path')
+    if args.codex and not Path(args.codex).is_file():
+        parser.error('Codex executable not found at ' + args.codex)
+    if not args.codex and not claude_configured():
+        parser.error('Neither Codex nor a Claude Code sign-in found; pass --codex /absolute/path')
     os.umask(0o077)
     if args.command == 'status':
         print(status_text(args.codex))

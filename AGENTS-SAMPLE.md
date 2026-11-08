@@ -12,7 +12,7 @@ In your copy of the project, save this template as `AGENTS.md`. Adjust the rules
 
 - `./iskra.sh "Text"` sends plain text to the configured owner.
 - `./iskra.sh --gif "https://example.com/animation.gif" "Caption"` sends an animation with a caption, when the user wants it.
-- `/status`, sent by the owner in Telegram, shows the available Codex and Claude limits. A local service handles it.
+- `/status`, sent by the owner in Telegram, shows the available Codex and/or Claude limits. A local service handles it.
 
 Run commands from the Iskra folder or by full path. Keep the token in Keychain and keep the owner binding. Pass message text as data, with safe quoting.
 

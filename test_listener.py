@@ -71,13 +71,26 @@ class ListenerTests(unittest.TestCase):
     def test_format_and_partial_provider_failure(self):
         self.assertIn('65% left', listener.window_text(300, 35, 4600, 1000))
         self.assertIn('in 1h 0m', listener.window_text(300, 35, 4600, 1000))
-        with patch('listener.codex_limits', return_value=[(300, 35, None)]), \
+        with patch('listener.claude_configured', return_value=True), \
+             patch('listener.codex_limits', return_value=[(300, 35, None)]), \
              patch('listener.claude_limits', side_effect=listener.Unavailable('HTTP 401')):
             text = listener.status_text('/fake/codex')
             self.assertIn('65% left', text)
             self.assertIn('Claude\nData unavailable\nHTTP 401', text)
             self.assertIn('Updated ', text)
             self.assertIn(' · ' + listener.TIMEZONE_LABEL, text)
+
+    def test_single_provider(self):
+        with patch('listener.claude_configured', return_value=False), \
+             patch('listener.codex_limits', return_value=[(300, 35, None)]):
+            text = listener.status_text('/fake/codex')
+            self.assertIn('Codex\n', text)
+            self.assertNotIn('Claude', text)
+        with patch('listener.claude_configured', return_value=True), \
+             patch('listener.claude_limits', return_value=[(300, 35, None)]):
+            text = listener.status_text(None)
+            self.assertIn('Claude\n', text)
+            self.assertNotIn('Codex', text)
 
     def test_compact_dates_width_and_midnight(self):
         now = dt.datetime(2026, 11, 8, 23, 0, tzinfo=listener.TIMEZONE).timestamp()
