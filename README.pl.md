@@ -6,6 +6,8 @@
 
 Iskra wysyła krótkie powiadomienia od agentów. Komenda `/status` pokazuje limity Claude Code i/lub Codexa, pozostałe procenty oraz terminy resetu. Działa lokalnie na Macu, bez wywoływania modeli przy obsłudze tej komendy.
 
+Status: alfa (`1.0.0-alpha.1`) – zobacz [changelog](CHANGELOG.md).
+
 ## Uruchomienie na swoim Macu
 
 Potrzebujesz Telegrama, Pęku kluczy, curl, Pythona 3.9+ oraz zainstalowanego i zalogowanego CLI Claude Code i/lub Codexa. `/status` pokazuje tylko te, których używasz. Sprawdź `python3 --version` oraz `claude auth status` i/lub `codex --version`. Instalatory są na stronach [Python](https://www.python.org/downloads/macos/), [Claude Code](https://code.claude.com/docs/en/quickstart) i [Codex](https://learn.chatgpt.com/docs/cli). Limity wymagają logowania do kont z subskrypcją.
@@ -45,14 +47,6 @@ Po zmianie nazwy lub przeniesieniu katalogu uruchom ponownie `python3 listener.p
 
 Konfiguracja i log są w `~/.config/iskra/`, a wpis usługi w `~/Library/LaunchAgents/app.iskra.telegram-status.plist`. Dane kont i tokeny są pobierane lokalnie. **Udostępniaj tylko repozytorium**, nigdy swojego `AGENTS.md`, konfiguracji ani tokenów. Każdy konfiguruje swojego bota i logowania na swoim Macu.
 
-## Gdy coś nie działa
-
-Sprawdź `~/.config/iskra/listener.log`. Odbiornik odpowiada tylko na `/status` właściciela w zapisanej prywatnej rozmowie. Odrzuca obcych nadawców, grupy, przekazane wiadomości i komendy starsze niż 2 min. Po błędzie wyślij świeżą komendę. Zapis postępu zapobiega ponownemu obsłużeniu tej samej wiadomości, ale przerwane wysyłanie może wymagać ponowienia komendy.
-
-Przy niedostępnych limitach Claude’a odśwież logowanie przez `claude` → `/login`. Codex korzysta z App Server `account/rateLimits/read`.
-
-Testy lokalne uruchomisz przez `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Składnię skryptu sprawdza `bash -n iskra.sh`.
-
 ## Jeden bot na osobę
 
 Każda osoba tworzy własnego bota. Nie udostępniaj swojego tokena – kto go ma, w pełni steruje botem. Dwie kopie Iskry na jednym bocie też by się kłóciły, bo Telegram oddaje każdą wiadomość tylko jednemu odbiorcy.
@@ -60,6 +54,14 @@ Każda osoba tworzy własnego bota. Nie udostępniaj swojego tokena – kto go m
 Inni mogą napisać do Twojego bota, ale Iskra odpowiada tylko właścicielowi zapisanemu przy `setup`.
 
 Nazwy się nie mieszają. Nazwa bota w Telegramie (`@…_bot`) jest unikalna na całym świecie, więc BotFather sam każe wybrać wolną. Wpis w Pęku kluczy jest lokalny na Twoim Macu, więc każdy używa tej samej nazwy `Iskra - Telegram Bot`.
+
+## Gdy coś nie działa
+
+Sprawdź `~/.config/iskra/listener.log`. Odbiornik odpowiada tylko na `/status` właściciela w zapisanej prywatnej rozmowie. Odrzuca obcych nadawców, grupy, przekazane wiadomości i komendy starsze niż 2 min. Po błędzie wyślij świeżą komendę. Zapis postępu zapobiega ponownemu obsłużeniu tej samej wiadomości, ale przerwane wysyłanie może wymagać ponowienia komendy.
+
+Przy niedostępnych limitach Claude’a odśwież logowanie przez `claude` → `/login`. Codex korzysta z App Server `account/rateLimits/read`.
+
+Testy lokalne uruchomisz przez `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Składnię skryptu sprawdza `bash -n iskra.sh`.
 
 ## Znane ograniczenia
 

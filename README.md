@@ -6,6 +6,8 @@
 
 Iskra sends short notifications from agents. The `/status` command shows Claude Code and/or Codex usage limits, the percentage left and reset times. It runs locally on a Mac and calls no models when answering this command.
 
+Status: alpha (`1.0.0-alpha.1`) – see the [changelog](CHANGELOG.md).
+
 ## Setting it up on your Mac
 
 You need Telegram, Keychain, curl, Python 3.9+ and the Claude Code and/or Codex CLI, installed and signed in. `/status` shows only the ones you use. Check `python3 --version` and `claude auth status` and/or `codex --version`. Installers are on the [Python](https://www.python.org/downloads/macos/), [Claude Code](https://code.claude.com/docs/en/quickstart) and [Codex](https://learn.chatgpt.com/docs/cli) sites. Limits require accounts with a subscription.

@@ -105,7 +105,7 @@ def codex_limits(binary):
 
     try:
         send({'id': 1, 'method': 'initialize', 'params': {
-            'clientInfo': {'name': 'iskra', 'version': '0.1.0'}}})
+            'clientInfo': {'name': 'iskra', 'version': '1.0.0-alpha.1'}}})
         deadline = time.monotonic() + 15
         while time.monotonic() < deadline:
             if not selector.select(0.5):
