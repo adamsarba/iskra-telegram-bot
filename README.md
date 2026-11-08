@@ -4,7 +4,7 @@
 
 Iskra sends short notifications from agents. The `/status` command shows Claude Code and/or Codex usage limits, the percentage left and reset times. It runs locally on a Mac and calls no models when answering this command.
 
-Status: alpha (`1.0.0-alpha.1`) – see the [changelog](CHANGELOG.md).
+[![Version: 1.0.0-alpha.1](https://img.shields.io/badge/version-1.0.0--alpha.1-orange)](CHANGELOG.md)
 
 ## Setting it up on your Mac
 
