@@ -77,7 +77,7 @@ class ListenerTests(unittest.TestCase):
             self.assertIn('65% left', text)
             self.assertIn('Claude\nData unavailable\nHTTP 401', text)
             self.assertIn('Updated ', text)
-            self.assertIn(' · Warsaw', text)
+            self.assertIn(' · ' + listener.TIMEZONE_LABEL, text)
 
     def test_compact_dates_width_and_midnight(self):
         now = dt.datetime(2026, 11, 8, 23, 0, tzinfo=listener.TIMEZONE).timestamp()

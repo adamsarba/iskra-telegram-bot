@@ -1,4 +1,4 @@
-# Iskra Telegram Bot
+# Iskra – Private Telegram Bot
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
@@ -29,9 +29,9 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 
 ## Everyday use
 
-- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left. Resets show a short weekday and the date without the year, or `today` / `tomorrow`. The `Updated` footer is when the data was read. Times use the `Europe/Warsaw` time zone, set in `listener.py`.
+- In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left. Resets show a short weekday and the date without the year, or `today` / `tomorrow`. The `Updated` footer is when the data was read. Times use your Mac's time zone.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
-- The Mac must be awake, online and signed in. The service starts at login. Data is cached for 60 s, and replies are at least 10 s apart.
+- The service starts at login. Data is cached for 60 s, and replies are at least 10 s apart.
 
 Copy **[AGENTS-SAMPLE.md](AGENTS-SAMPLE.md)** to `AGENTS.md` and adjust it to your rules. `AGENTS.md` stays local and is ignored by Git. Your coordinator should read the current file before notifying – add a reference with its full path to the coordinator's startup instructions. Writing the rules does not start any agents.
 
@@ -57,13 +57,19 @@ Names don't clash. A Telegram bot username (`@…_bot`) is globally unique, so B
 
 Check `~/.config/iskra/listener.log`. The listener only answers the owner's `/status` in the saved private chat. It rejects other senders, groups, forwarded messages and commands older than 2 min. After an error, send a fresh command. Saved progress prevents handling the same message twice, but an interrupted send may need the command again.
 
-If Claude limits are unavailable, refresh the sign-in with `claude` → `/login`. Reading Claude limits uses its CLI endpoint, which may change. Codex uses the App Server `account/rateLimits/read`. It has been tested on one Mac; setup on a second Mac still needs a trial.
+If Claude limits are unavailable, refresh the sign-in with `claude` → `/login`. Codex uses the App Server `account/rateLimits/read`.
 
 Run the local tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Check the script syntax with `bash -n iskra.sh`.
 
+## Known limitations
+
+- Claude limits come from an undocumented endpoint used by Claude Code. An update may break it.
+- Tested on one Mac so far.
+- The Mac must be awake, online and signed in.
+
 ## Contributing
 
-Contributions are welcome – feel free to open an issue or a pull request.
+Contributions are welcome – feel free to open an issue or a pull request. A Linux port is welcome too: the macOS-specific parts are Keychain, Claude Code credentials and the launchd service.
 
 ## Author and licence
 

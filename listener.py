@@ -19,11 +19,22 @@ import sys
 import tempfile
 import textwrap
 import time
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 CONFIG = Path.home() / '.config/iskra'
 LABEL = 'app.iskra.telegram-status'
-TIMEZONE = ZoneInfo('Europe/Warsaw')
+
+
+def system_timezone():
+    # macOS links /etc/localtime to the zone chosen in System Settings.
+    try:
+        return ZoneInfo(os.path.realpath('/etc/localtime').split('zoneinfo/', 1)[1])
+    except (IndexError, ValueError, OSError, ZoneInfoNotFoundError):
+        return ZoneInfo('UTC')
+
+
+TIMEZONE = system_timezone()
+TIMEZONE_LABEL = TIMEZONE.key.rsplit('/', 1)[-1].replace('_', ' ')
 
 
 class Unavailable(Exception):
@@ -199,7 +210,7 @@ def status_text(binary):
             except Exception as error:
                 detail = str(error) if isinstance(error, Unavailable) else 'read failed'
                 sections.append(name + '\nData unavailable\n' + textwrap.fill(detail, width=26))
-    return '\n\n'.join(sections) + '\n\n' + dt.datetime.now(TIMEZONE).strftime('Updated %H:%M') + ' · Warsaw'
+    return '\n\n'.join(sections) + '\n\n' + dt.datetime.now(TIMEZONE).strftime('Updated %H:%M') + ' · ' + TIMEZONE_LABEL
 
 
 def authorized_status(update, owner, username, now):

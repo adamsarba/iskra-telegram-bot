@@ -29,9 +29,9 @@ Jeżeli `codex` działa tylko w aplikacji, podaj ścieżkę do jego pliku wykony
 
 ## Codzienne używanie
 
-- W Telegramie wysyłasz `/status`. Odpowiedź jest po angielsku, wąskim blokiem monospace. Paski pokazują pozostały limit. Reset zawiera skrót dnia tygodnia i datę bez roku lub `today` / `tomorrow`. Stopka `Updated` oznacza czas odczytu danych. Godziny są w strefie `Europe/Warsaw`, ustawionej w `listener.py`.
+- W Telegramie wysyłasz `/status`. Odpowiedź jest po angielsku, wąskim blokiem monospace. Paski pokazują pozostały limit. Reset zawiera skrót dnia tygodnia i datę bez roku lub `today` / `tomorrow`. Stopka `Updated` oznacza czas odczytu danych. Godziny są w strefie czasowej Twojego Maca.
 - Agent może wysłać tekst przez `./iskra.sh "Gotowe. Możesz sprawdzić wynik."` albo animację przez `./iskra.sh --gif "https://example.com/animacja.gif" "Gotowe!"`.
-- Mac musi być wybudzony, online i zalogowany. Usługa startuje przy logowaniu. Dane mają pamięć podręczną 60 s, a odstęp między odpowiedziami wynosi co najmniej 10 s.
+- Usługa startuje przy logowaniu. Dane mają pamięć podręczną 60 s, a odstęp między odpowiedziami wynosi co najmniej 10 s.
 
 Skopiuj **[AGENTS-SAMPLE.md](AGENTS-SAMPLE.md)** jako `AGENTS.md` i dostosuj do swoich zasad. `AGENTS.md` zostaje lokalnie i Git go pomija. Koordynator powinien czytać aktualny plik przed powiadomieniem – dodaj odwołanie z pełną ścieżką w jego instrukcjach startowych. Zapis zasad sam nie uruchamia agentów.
 
@@ -49,7 +49,7 @@ Konfiguracja i log są w `~/.config/iskra/`, a wpis usługi w `~/Library/LaunchA
 
 Sprawdź `~/.config/iskra/listener.log`. Odbiornik odpowiada tylko na `/status` właściciela w zapisanej prywatnej rozmowie. Odrzuca obcych nadawców, grupy, przekazane wiadomości i komendy starsze niż 2 min. Po błędzie wyślij świeżą komendę. Zapis postępu zapobiega ponownemu obsłużeniu tej samej wiadomości, ale przerwane wysyłanie może wymagać ponowienia komendy.
 
-Przy niedostępnych limitach Claude’a odśwież logowanie przez `claude` → `/login`. Odczyt Claude’a korzysta z endpointu jego CLI, który może się zmienić. Codex korzysta z App Server `account/rateLimits/read`. Działanie na tym Macu zostało sprawdzone; instalacja na drugim Macu wymaga jeszcze próby.
+Przy niedostępnych limitach Claude’a odśwież logowanie przez `claude` → `/login`. Codex korzysta z App Server `account/rateLimits/read`.
 
 Testy lokalne uruchomisz przez `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Składnię skryptu sprawdza `bash -n iskra.sh`.
 
@@ -61,9 +61,15 @@ Inni mogą napisać do Twojego bota, ale Iskra odpowiada tylko właścicielowi z
 
 Nazwy się nie mieszają. Nazwa bota w Telegramie (`@…_bot`) jest unikalna na całym świecie, więc BotFather sam każe wybrać wolną. Wpis w Pęku kluczy jest lokalny na Twoim Macu, więc każdy używa tej samej nazwy `Iskra - Telegram Bot`.
 
+## Znane ograniczenia
+
+- Limity Claude’a pochodzą z nieudokumentowanego endpointu, z którego korzysta Claude Code. Aktualizacja może go zepsuć.
+- Na razie przetestowane na jednym Macu.
+- Mac musi być wybudzony, online i zalogowany.
+
 ## Współtworzenie
 
-Wkład mile widziany – śmiało zgłaszaj issue albo pull request.
+Wkład mile widziany – śmiało zgłaszaj issue albo pull request. Port na Linuksa też: specyficzne dla macOS są Pęk kluczy, dane logowania Claude Code i usługa launchd.
 
 ## Autor i licencja
 
