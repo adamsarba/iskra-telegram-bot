@@ -1,27 +1,27 @@
-# Iskra – prosty wzór zasad
+# Iskra – simple rules template
 
-W swojej kopii projektu zapisz ten wzór jako `AGENTS.md`. Dostosuj zasady i dodaj pełną ścieżkę do tego pliku w instrukcjach startowych swojego agenta.
+In your copy of the project, save this template as `AGENTS.md`. Adjust the rules and add the full path to this file to your agent's startup instructions.
 
-## Kiedy powiadamiać
+## When to notify
 
-- Wyślij wiadomość, gdy użytkownik o to poprosi albo uzgodni powiadomienie po konkretnym zadaniu.
-- Po sprawdzeniu wyniku wyślij jedno krótkie podsumowanie. Bieżące szczegóły zostaw w rozmowie.
-- Przeczytaj aktualny plik przed wysłaniem. Uzgodnione zmiany zasad zapisuj tutaj.
+- Send a message when the user asks for it or agrees to a notification after a specific task.
+- After checking the result, send one short summary. Keep ongoing details in the conversation.
+- Read the current file before sending. Record agreed rule changes here.
 
-## Co jest dostępne
+## What is available
 
-- `./iskra.sh "Treść"` wysyła zwykły tekst do skonfigurowanego właściciela.
-- `./iskra.sh --gif "https://example.com/animacja.gif" "Podpis"` wysyła animację z podpisem, gdy użytkownik tego chce.
-- `/status` wpisane przez właściciela w Telegramie pokazuje dostępne limity Codexa i Claude’a. Obsługuje je lokalna usługa.
+- `./iskra.sh "Text"` sends plain text to the configured owner.
+- `./iskra.sh --gif "https://example.com/animation.gif" "Caption"` sends an animation with a caption, when the user wants it.
+- `/status`, sent by the owner in Telegram, shows the available Codex and Claude limits. A local service handles it.
 
-Polecenia uruchamiaj z katalogu Iskry lub przez pełną ścieżkę. Chroń token w Pęku kluczy i zachowaj przypisanie właściciela. Tekst wiadomości przekazuj jako dane, z bezpiecznym cytowaniem.
+Run commands from the Iskra folder or by full path. Keep the token in Keychain and keep the owner binding. Pass message text as data, with safe quoting.
 
-## Jak pisać
+## How to write
 
-Krótko, po polsku, zwyczajnie. Podaj rezultat i ewentualnie jedną rzecz do sprawdzenia.
+Short, plain, in the user's language. Give the result and, if needed, one thing to check.
 
-> Gotowe! Zdjęcia są już uporządkowane. Możesz zajrzeć do folderu.
+> Done! The photos are sorted. You can take a look in the folder.
 
-> Eksport się zatrzymał. Potrzebuję od Ciebie wyboru formatu – szczegóły są w czacie.
+> The export stopped. I need you to pick a format – details are in the chat.
 
-Przy błędzie wysyłania poinformuj użytkownika w bieżącej rozmowie. Wysyłaj wyłącznie treści objęte zgodą użytkownika i bez sekretów.
+If sending fails, tell the user in the current conversation. Send only content the user has agreed to, and never secrets.
