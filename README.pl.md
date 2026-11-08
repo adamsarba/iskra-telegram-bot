@@ -1,4 +1,6 @@
-# Iskra – prywatny bot Telegrama
+# Iskra Telegram Bot
+
+[![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 [English](README.md) · **Polski**
 
@@ -58,6 +60,10 @@ Każda osoba tworzy własnego bota. Nie udostępniaj swojego tokena – kto go m
 Inni mogą napisać do Twojego bota, ale Iskra odpowiada tylko właścicielowi zapisanemu przy `setup`.
 
 Nazwy się nie mieszają. Nazwa bota w Telegramie (`@…_bot`) jest unikalna na całym świecie, więc BotFather sam każe wybrać wolną. Wpis w Pęku kluczy jest lokalny na Twoim Macu, więc każdy używa tej samej nazwy `Iskra - Telegram Bot`.
+
+## Współtworzenie
+
+Wkład mile widziany – śmiało zgłaszaj issue albo pull request.
 
 ## Autor i licencja
 

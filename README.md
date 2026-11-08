@@ -1,4 +1,6 @@
-# Iskra – private Telegram bot
+# Iskra Telegram Bot
+
+[![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 **English** · [Polski](README.pl.md)
 
@@ -58,6 +60,10 @@ Check `~/.config/iskra/listener.log`. The listener only answers the owner's `/st
 If Claude limits are unavailable, refresh the sign-in with `claude` → `/login`. Reading Claude limits uses its CLI endpoint, which may change. Codex uses the App Server `account/rateLimits/read`. It has been tested on one Mac; setup on a second Mac still needs a trial.
 
 Run the local tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Check the script syntax with `bash -n iskra.sh`.
+
+## Contributing
+
+Contributions are welcome – feel free to open an issue or a pull request.
 
 ## Author and licence
 
