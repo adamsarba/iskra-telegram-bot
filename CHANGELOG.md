@@ -5,6 +5,7 @@
 ### Added
 
 - `iskra.sh --since` prints the minutes since the last sent message. Only the send time is stored, never the text.
+- Pixel art icon in the README, with its Aseprite source in `assets/`.
 
 ## 1.0.0-beta.1 – 2026-11-08
 
