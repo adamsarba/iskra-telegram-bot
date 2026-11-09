@@ -30,6 +30,7 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 - In Telegram, send `/status`. The reply is a narrow monospace block. Bars show the limit left, with the time until the reset. Resets show `today` or `tomorrow` with the time, otherwise a short weekday and the date without the year. The `Updated` footer is when the data was read. Times use your Mac's time zone.
 - Send `/status short` for one line per tool with the limit left, e.g. `Claude: 5h 88% · 7d 54%`.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
+- `./iskra.sh --since` prints the minutes since the last message Iskra sent, or `none`. Coordinators can use it to time "still working" messages. Only the time is stored, in `~/.config/iskra/last-sent`, never the text.
 - The service starts at login. Data is cached for 60 s.
 
 Copy **[AGENTS-SAMPLE.md](AGENTS-SAMPLE.md)** to `AGENTS.md` and adjust it to your rules. `AGENTS.md` stays local and is ignored by Git. Your coordinator should read the current file before notifying – add a reference with its full path to the coordinator's startup instructions. Writing the rules does not start any agents.
