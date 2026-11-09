@@ -1,4 +1,4 @@
-<img src="assets/iskra.png" alt="Iskra icon" width="128">
+<img src="assets/iskra.png" alt="Iskra icon" width="64">
 
 # Iskra – Private Telegram Bot
 
