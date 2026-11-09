@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.0-beta.2 – 2026-11-09
+
+### Added
+
+- `iskra.sh --since` prints the minutes since the last sent message. Only the send time is stored, never the text.
+
 ## 1.0.0-beta.1 – 2026-11-08
 
 ### Added
