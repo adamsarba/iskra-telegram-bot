@@ -1,18 +1,23 @@
 #!/bin/bash
-# Usage: iskra.sh setup | iskra.sh "text" | iskra.sh --gif URL "caption"
+# Usage: iskra.sh setup | iskra.sh "text" | iskra.sh --gif URL "caption" | iskra.sh --since
 set -eu
 set +x
 fail() { printf 'Iskra: %s\n' "$*" >&2; exit 1; }
 dir="$HOME/.config/iskra"
 mode=sendMessage
-if [ "$#" -eq 1 ] && [ "$1" = setup ]; then
+if [ "$#" -eq 1 ] && [ "$1" = --since ]; then
+  # Minutes since the last successful send, or "none"; reads only a timestamp.
+  last=$(cat "$dir/last-sent" 2>/dev/null || true)
+  if [[ "$last" =~ ^[0-9]+$ ]]; then echo $(( ($(date +%s) - last) / 60 )); else echo none; fi
+  exit 0
+elif [ "$#" -eq 1 ] && [ "$1" = setup ]; then
   # Lock: once a chat is saved, a stranger messaging the bot cannot take it over.
   [ ! -e "$dir/chat_id" ] || fail "Chat id already saved; delete $dir/chat_id yourself to redo setup."
   mode=getUpdates
 elif [ "$#" -eq 3 ] && [ "$1" = --gif ]; then
   mode=sendAnimation
 elif [ "$#" -ne 1 ]; then
-  fail 'Usage: iskra.sh setup | iskra.sh "text" | iskra.sh --gif URL "caption"'
+  fail 'Usage: iskra.sh setup | iskra.sh "text" | iskra.sh --gif URL "caption" | iskra.sh --since'
 fi
 token=$(security find-generic-password -s "Iskra - Telegram Bot" -w 2>/dev/null) || fail 'Bot token missing from Keychain.'
 [[ "$token" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] || fail 'Bot token missing or invalid in Keychain.'
@@ -63,4 +68,7 @@ if [ "$mode" = getUpdates ]; then
   umask 077; mkdir -p "$dir"; chmod 700 "$dir"
   printf '%s\n' "$latest" > "$dir/chat_id"; chmod 600 "$dir/chat_id"
   printf 'Chat id saved: %s\n' "$latest"
+else
+  # Time only, never the text; a failed write must not fail the send.
+  (umask 077; date +%s > "$dir/last-sent") 2>/dev/null || true
 fi
