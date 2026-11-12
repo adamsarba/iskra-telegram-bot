@@ -19,8 +19,8 @@ elif [ "$#" -eq 3 ] && [ "$1" = --gif ]; then
 elif [ "$#" -ne 1 ]; then
   fail 'Usage: iskra.sh setup | iskra.sh "text" | iskra.sh --gif URL "caption" | iskra.sh --since'
 fi
-token=$(security find-generic-password -s "Iskra - Telegram Bot" -w 2>/dev/null) || fail 'Bot token missing from Keychain.'
-[[ "$token" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] || fail 'Bot token missing or invalid in Keychain.'
+token=$(security find-generic-password -s "Iskra - Telegram Bot" -w 2>/dev/null) || fail 'Could not read the Iskra token from Keychain. The item may be missing, or macOS may have denied access. Check that the login Keychain is unlocked and the item is named "Iskra - Telegram Bot". If prompted, approve access for this run; if running in a sandbox, ask the authorized user to rerun this command through the normal approval flow outside the sandbox.'
+[[ "$token" =~ ^[0-9]+:[A-Za-z0-9_-]+$ ]] || fail 'The Keychain item was read, but its value is not in Telegram bot-token format. Check the item in Keychain Access; do not paste the token into chat or logs.'
 if [ "$mode" != getUpdates ]; then
   [ -r "$dir/chat_id" ] || fail 'Chat id missing; send /start to the bot, then run iskra.sh setup.'
   chat=$(<"$dir/chat_id")
