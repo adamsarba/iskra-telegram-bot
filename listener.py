@@ -3,6 +3,7 @@
 
 import argparse
 import concurrent.futures
+from contextlib import contextmanager, ExitStack
 import datetime as dt
 import fcntl
 import html
@@ -18,8 +19,11 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+import threading
 import time
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+import iskra_ipc
 
 CONFIG = Path.home() / '.config/iskra'
 LABEL = 'app.iskra.telegram-status'
@@ -262,10 +266,36 @@ def authorized_status(update, owner, username, now):
     return commands.get(command) if allowed else None
 
 
+@contextmanager
+def outgoing_service(owner):
+    def send(method, fields):
+        try:
+            telegram(method, dict(fields, chat_id=owner))
+        except Unavailable as error:
+            if str(error) in ('Keychain entry unavailable', 'invalid bot token', 'HTTP 401'):
+                raise iskra_ipc.QueueError(str(error)) from None
+            raise
+        # Timestamp only, shared with iskra.sh --since.
+        try:
+            (CONFIG / 'last-sent').write_text(str(int(time.time())) + '\n')
+            os.chmod(CONFIG / 'last-sent', 0o600)
+        except OSError:
+            pass
+
+    stop = threading.Event()
+    worker = threading.Thread(target=iskra_ipc.serve, args=(stop, send), daemon=True)
+    worker.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        worker.join(timeout=15)
+
+
 def listen(binary):
     CONFIG.mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(CONFIG, 0o700)
-    with (CONFIG / 'listener.lock').open('a') as lock:
+    with (CONFIG / 'listener.lock').open('a') as lock, ExitStack() as services:
         os.chmod(lock.name, 0o600)
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         owner = int((CONFIG / 'chat_id').read_text().strip())
@@ -282,6 +312,7 @@ def listen(binary):
                                              'allowed_updates': '["message"]'})
             offset = backlog[-1]['update_id'] + 1 if backlog else 0
             save_json(cursor, offset)
+        services.enter_context(outgoing_service(owner))
         cached = {}; cached_at = {}; last_reply = {}
         print('Iskra listener ready', flush=True)
         while True:

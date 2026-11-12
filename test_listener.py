@@ -1,6 +1,7 @@
 """Offline regression checks for command authorization and read-only limit queries."""
 
 import copy
+from contextlib import nullcontext
 import datetime as dt
 import io
 import json
@@ -145,7 +146,8 @@ class ListenerTests(unittest.TestCase):
                     raise KeyboardInterrupt
                 return {}
 
-            with patch('listener.CONFIG', config), patch('listener.telegram', side_effect=telegram), \
+            with patch('listener.outgoing_service', return_value=nullcontext()), \
+                 patch('listener.CONFIG', config), patch('listener.telegram', side_effect=telegram), \
                  patch('listener.status_text', return_value='status') as status, \
                  patch('listener.time.time', return_value=1000), patch('sys.stdout', io.StringIO()):
                 with self.assertRaises(KeyboardInterrupt):
