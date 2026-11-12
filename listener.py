@@ -26,6 +26,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import iskra_ipc
 
 CONFIG = Path.home() / '.config/iskra'
+VERSION = '1.0.0-beta.3'
 LABEL = 'app.iskra.telegram-status'
 
 
@@ -109,7 +110,7 @@ def codex_limits(binary):
 
     try:
         send({'id': 1, 'method': 'initialize', 'params': {
-            'clientInfo': {'name': 'iskra', 'version': '1.0.0-beta.2'}}})
+            'clientInfo': {'name': 'iskra', 'version': VERSION}}})
         deadline = time.monotonic() + 15
         while time.monotonic() < deadline:
             if not selector.select(0.5):

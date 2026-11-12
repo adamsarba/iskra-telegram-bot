@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0-beta.3 – 2026-11-12
+
+### Added
+
+- Local outgoing queue handled by the existing listener. Normal sends no longer read Keychain or contact Telegram in the agent process.
+- `iskra.sh --check` checks sending-service availability; `--receipt ID` checks uncertain outcomes. Requests expire before sending and interrupted sends are never retried automatically.
+
+### Changed
+
+- Offline regression tests are grouped in `tests/` and run with unittest discovery.
+
+### Fixed
+
+- Keychain read failures now explain that the item may be missing or access denied, and provide safe recovery guidance. Invalid token format and Telegram HTTP 401 have separate diagnostics.
+- Atomic queue writes recover from interrupted writes; valid Unicode messages fit within the queue payload limit.
+- Malformed service health and receipts return safe errors.
+- Offline regressions cover queue delivery, expiration, interrupted sends, private permissions, token diagnostics and secret redaction.
+
 ## 1.0.0-beta.2 – 2026-11-09
 
 ### Added

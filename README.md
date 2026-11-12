@@ -4,7 +4,7 @@
 
 **Your agents finish the job. Your phone lights up.**
 
-[![Version: 1.0.0-beta.2](https://img.shields.io/badge/version-1.0.0--beta.2-orange)](CHANGELOG.md) [![Status: in testing](https://img.shields.io/badge/status-in_testing-yellow)](#known-limitations) [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![Version: 1.0.0-beta.3](https://img.shields.io/badge/version-1.0.0--beta.3-orange)](CHANGELOG.md) [![Status: in testing](https://img.shields.io/badge/status-in_testing-yellow)](#known-limitations) [![Claude Code](https://img.shields.io/badge/Claude_Code-supported-D97757?logo=claude&logoColor=white)](https://code.claude.com/docs/en/quickstart) [![Codex](https://img.shields.io/badge/Codex-supported-000000)](https://learn.chatgpt.com/docs/cli) [![macOS](https://img.shields.io/badge/macOS-only-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 Iskra (Polish for _spark_) sends short notifications from agents. The `/status` command shows Claude Code and/or Codex usage limits, the percentage left and reset times. It runs locally on a Mac and calls no models when answering this command.
 
@@ -20,10 +20,12 @@ You need Telegram, Keychain, curl, Python 3.9+ and the Claude Code and/or Codex 
 ```sh
 chmod 700 iskra.sh
 ./iskra.sh setup
-./iskra.sh "Hi, Iskra works!"
 python3 listener.py status
 python3 listener.py install
+./iskra.sh "Hi, Iskra works!"
 ```
+
+Sending requires the local service installed above. Before the first send, wait for `./iskra.sh --check` to succeed; service startup may take a few seconds. Agents submit messages to the service through a private local queue; the service reads Keychain and calls Telegram. Agents do not need Keychain or network access for each send.
 
 `setup` saves the ID of the latest private chat and locks further setup. The test message should reach you. After installing, send `/status` to your bot. On its first run the listener skips earlier messages.
 
@@ -35,6 +37,7 @@ If `codex` only runs inside the app, pass the path to its executable to both Pyt
 - Send `/status short` for one line per tool with the limit left, e.g. `Claude: 5h 88% · 7d 54%`.
 - An agent can send text with `./iskra.sh "Done. You can check the result."` or an animation with `./iskra.sh --gif "https://example.com/animation.gif" "Done!"`.
 - `./iskra.sh --since` prints the minutes since the last message Iskra sent, or `none`. Coordinators can use it to time "still working" messages. Only the time is stored, in `~/.config/iskra/last-sent`, never the text.
+- `./iskra.sh --check` checks whether the local sending service is available without sending anything.
 - The service starts at login. Data is cached for 60 s.
 
 Copy **[AGENTS-SAMPLE.md](AGENTS-SAMPLE.md)** to `AGENTS.md` and adjust it to your rules. `AGENTS.md` stays local and is ignored by Git. Your coordinator should read the current file before notifying – add a reference with its full path to the coordinator's startup instructions. Writing the rules does not start any agents.
@@ -63,7 +66,13 @@ Check `~/.config/iskra/listener.log`. The listener only answers the owner's `/st
 
 If Claude limits are unavailable, refresh the sign-in with `claude` → `/login`. Codex uses the App Server `account/rateLimits/read`.
 
-Run the local tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest -v test_listener.py`. Check the script syntax with `bash -n iskra.sh`.
+If the local sending service is unavailable, run `./iskra.sh --check`. After updating an existing installation, run `python3 listener.py install` once, preserving any existing `--codex` argument. Normal sends use the service without an initial sandboxed Keychain attempt or an automatic direct-send fallback. A sandbox must permit writes to the user's private queue in `/private/tmp/iskra-<uid>`; successful sends were verified in Codex and reported by the owner in MausBot with GPT and Kiro on the same Mac. Other sandbox environments remain unverified.
+
+A zero send exit code means Telegram accepted the message, not merely that it entered the queue. Requests expire after 30 s if not started. An interrupted or uncertain send is never retried automatically. If the command returns a receipt ID, use `./iskra.sh --receipt ID` to check the outcome before considering another send. Receipts expire after 24 h while the service runs and may disappear on reboot. Queued text is private to the local macOS user and removed after processing; receipts contain only the outcome. Do not submit secrets. Other processes running as the same user share this local sending capability; notification authorization still follows `AGENTS.md`.
+
+Only initial `setup` reads Keychain directly. A read failure can mean a missing item or denied access; its exit code alone does not distinguish them. Run setup from an authorized Terminal or through the agent tool's normal approval flow. A token-format error means the value was read but has an invalid format; HTTP 401 means Telegram rejected it. Never share the token or rerun setup to repair delivery.
+
+Run the local tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v`. Check the script syntax with `bash -n iskra.sh`.
 
 ## Known limitations
 

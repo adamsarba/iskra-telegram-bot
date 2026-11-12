@@ -15,7 +15,7 @@ In your copy of the project, save this template as `AGENTS.md`. Adjust the rules
 - `./iskra.sh --since` prints the minutes since the last message sent by any agent, or `none`.
 - `/status` (or `/status short`), sent by the owner in Telegram, shows the available Claude Code and/or Codex limits. A local service handles it.
 
-Run commands from the Iskra folder or by full path. Keep the token in Keychain and keep the owner binding. Pass message text as data, with safe quoting.
+Run commands from the Iskra folder or by full path. Normal sends use the local service and never read Keychain in the agent process. Send directly; the client checks service availability. Use `./iskra.sh --check` only for diagnostics. Do not fall back to a direct send or rerun setup. Keep the token in Keychain and keep the owner binding. Pass message text as data, with safe quoting.
 
 ## How to write
 
@@ -24,5 +24,7 @@ Short, plain, in the user's language. Give the result and, if needed, one thing 
 > Done! The photos are sorted. You can take a look in the folder.
 
 > The export stopped. I need you to pick a format – details are in the chat.
+
+Exit 0 means Telegram accepted the message. After an uncertain result, check the returned receipt with `./iskra.sh --receipt ID` and do not resend automatically.
 
 If sending fails, tell the user in the current conversation. Send only content the user has agreed to, and never secrets.
