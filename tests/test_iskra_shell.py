@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 
-SCRIPT = Path(__file__).with_name('iskra.sh')
+SCRIPT = Path(__file__).resolve().parents[1] / 'iskra.sh'
 
 
 class IskraShellTests(unittest.TestCase):
